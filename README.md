@@ -14,6 +14,13 @@ Users can run commands like:
 Output:
 ![Output example](https://cdn.discordapp.com/attachments/244926856137146370/330833998274363392/meme.png)
 
+Or:
+```
++meme scroll "You can't rewrite everything in Rust"
+```
+Output:
+![Output example](https://cdn.discordapp.com/attachments/332271124161495040/332271314297683978/meme.png)
+
 ## Installing/Running
 ------
 
