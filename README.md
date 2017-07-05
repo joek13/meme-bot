@@ -52,6 +52,7 @@ These properties are specific to `Image` and `Either` features, and will be igno
 | `mask` | Path String | Optional | A path to a mask image. Mask images are grayscale, and *must* match the dimensions of the template image. The mask will be applied to this feature only, and parts of the mask that are not white will cause those parts of the feature be masked out in generated images. Leaving this off will result in no masking.
 #### Text-specific properties
 These properties are specific to `Text` and `Either` features, and will be ignored in `Image` features.
+
 | Property | Type |Required | Description                                |
 |:--------:|:----:|:--------:|--------------------------------------------|
 | `font_size` | int | Required | The maximum font size to use in generated images, in pixels. |
