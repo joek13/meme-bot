@@ -5,7 +5,10 @@ MemeBot is a Discord bot that can help you and your users make memes. Using a se
 ------
 
 Clone this repo and run with `cargo run`. Be sure that you have set the env var `DISCORD_TOKEN` (i.e. `export DISCORD_TOKEN=mytoken`) to your bot's token before running.
+## Configuring
+------
 
+The bot looks for a file called `config.toml` in your current working directory, and won't run without it. `config.toml` should look something like `example_config.toml`. For your convenience, you can rename `example_config.toml` to `config.toml` and then fill in your token, etc.
 ## Templates
 ------
 
