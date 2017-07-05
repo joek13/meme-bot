@@ -30,8 +30,10 @@ Templates are TOML files loaded from the `./templates/` directory and provide a 
 | `short_name`| String | Required | The short, easy name to use with commands. |
 | `image` | Path String | Required | The base image to build templates from. The path is relative to this template. |
 | `features` | List | Required | A list of features to put on the template. |
+
 ### Feature Dict Spec
 A feature is a TOML dictionary. Each feature can have the following properties:
+
 | Property | Type |Required | Description                                |
 |:--------:|:----:|:--------:|--------------------------------------------|
 | `kind` | String | Required | The type of feature this is. Can be `Text`, `Image`, or `Either`. |
@@ -40,8 +42,10 @@ A feature is a TOML dictionary. Each feature can have the following properties:
 | `w` | int | Required | The width of this feature, in pixels. |
 | `h` | int | Required | The height of this feature, in pixels. |
 | `rotation` | float | Optional | The rotation of this feature, in degrees. Features are rotated around their top-left corner. |
+
 #### Image-specific properties
 These properties are specific to `Image` and `Either` features, and will be ignored in `Text` features.
+
 | Property | Type |Required | Description                                |
 |:--------:|:----:|:--------:|--------------------------------------------|
 | `stretch` | bool | Optional | Whether to stretch the target image to fit the provided rect. Stretching will *not* maintain the image's aspect ratio. Defaults to `false`. |
@@ -53,6 +57,7 @@ These properties are specific to `Text` and `Either` features, and will be ignor
 | `font_size` | int | Required | The maximum font size to use in generated images, in pixels. |
 | `alignment` | String | Optional | The text alignment to use. Defaults to `Left`, but can be `Left`, `Center`, or `Right`. |
 | `font_color` | [int, int, int, int] | Optional | An array four integers 0-255 long representing the font color to use. Channels are R, G, B, A. Defaults to [0, 0, 0, 255]. |
+
 #### Example template
 `whowouldwin.toml` from `./templates`: 
 ```
