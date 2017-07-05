@@ -108,9 +108,11 @@ fn main() {
                             })
                     });
                     client.on_ready(|_ctx, e| {
-                                        info!("Logged in as {}", e.user.name);
-                                        _ctx.set_game(Game::playing("memes"));
-                                    });
+                        info!("Logged in as {}", e.user.name);
+                        _ctx.set_game(Game::playing(format!("{}help for help",
+                                                            CONFIG.read().unwrap().prefix)
+                                                            .as_str()));
+                    });
                     let _ = client.start();
                 }
                 Err((template, e)) => {
@@ -310,9 +312,7 @@ fn help(_ctx: &mut Context,
             response += format!("Use `{}help <command>` to get more specific information about one command.",
                                 CONFIG.read().unwrap().prefix)
                     .as_str();
-            let _ = message
-                .author
-                .direct_message(|m| m.content(response.as_str()));
+            let _ = message.channel_id.say(response.as_str());
         }
         1 => {
             //info for one command
