@@ -1,6 +1,19 @@
 # MemeBot
 MemeBot is a Discord bot that can help you and your users make memes. Using a set of owner-defined templates, users can use the `+meme` command to generate memes at will. 
 
+## In action
+------
+
+![In action GIF](https://fat.gfycat.com/FastWideeyedArmedcrab.gif)
+## Example commands
+------
+Users can run commands like:
+```
++meme rare "a farmed jungle legion"
+```
+Output:
+![Output example](https://cdn.discordapp.com/attachments/244926856137146370/330833998274363392/meme.png)
+
 ## Installing/Running
 ------
 
