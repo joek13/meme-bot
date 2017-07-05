@@ -1,0 +1,12 @@
+name="Scroll of Truth"
+short_name="scroll"
+image="./scroll.png"
+
+[[features]]
+kind="Text"
+x=110
+y=321
+w=100
+h=130
+rotation=-1.5
+font_size=15

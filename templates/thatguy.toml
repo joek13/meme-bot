@@ -1,0 +1,10 @@
+name="That Guy"
+short_name="thatguy"
+image="./thatguy.png"
+[[features]]
+kind="Text"
+w=234
+h=302
+x=325
+y=741
+font_size=30

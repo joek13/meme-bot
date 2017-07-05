@@ -1,0 +1,11 @@
+name="Hurtful Dog"
+short_name="dog"
+image="./dog.png"
+[[features]]
+kind="Text"
+x=18
+y=263
+w=222
+h=36
+font_size=36
+alignment="Center"

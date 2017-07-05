@@ -1,0 +1,11 @@
+name="Not All Disabilities"
+short_name="disabilities"
+image="./disabilities.jpg"
+
+[[features]]
+w=161
+h=251
+x=508
+y=301
+kind="Image"
+stretch=false

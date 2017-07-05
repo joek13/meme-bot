@@ -1,0 +1,11 @@
+name="Roll Safe"
+short_name="rollsafe"
+image="./rollsafe.jpg"
+
+[[features]]
+kind="Text"
+x=5
+y=5
+w=1160
+h=160
+font_size=80

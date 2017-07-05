@@ -1,0 +1,11 @@
+name="Handshake"
+short_name="shake"
+image="./shake.jpg"
+[[features]]
+kind="Text"
+x=0
+y=0
+w=552
+h=90
+alignment="Center"
+font_size=85

@@ -1,0 +1,12 @@
+name="Passing Notes"
+short_name="note"
+image="./note.png"
+[[features]]
+kind="Text"
+x=373
+y=384
+w=140
+h=90
+font_size = 20
+rotation=27
+alignment="Center"

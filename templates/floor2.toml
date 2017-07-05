@@ -1,0 +1,18 @@
+name="The Floor Is Inverse"
+short_name="floor2"
+image="./floor2.jpg"
+[[features]]
+kind="Text"
+x=0
+y=0
+w=455
+h=83
+font_size=40
+[[features]]
+kind="Image"
+rotation=-18
+x=184
+y=177
+w=84
+h=84
+

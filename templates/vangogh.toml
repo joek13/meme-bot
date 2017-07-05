@@ -1,0 +1,9 @@
+name="Misunderstood Van Gogh"
+short_name="vangogh"
+image="./vangogh.jpg"
+[[features]]
+kind="Image"
+x=206
+y=728
+w=249
+h=209

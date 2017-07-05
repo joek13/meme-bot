@@ -1,0 +1,26 @@
+[package]
+name = "meme_bot"
+version = "0.1.0"
+authors = ["Joe K <joek1301@gmail.com>"]
+
+[dependencies]
+toml="0.4.1"
+serde = "1.0.8"
+serde_derive = "1.0.8"
+textwrap = "0.6"
+rusttype="0.2.1"
+imageproc={git="https://github.com/joek13/imageproc.git"}
+lazy_static="*"
+serenity={git="https://github.com/joek13/serenity.git"}
+time="*"
+hyper="0.10.12"
+url="1.5.0"
+futures="*"
+hyper-native-tls="*"
+log = "0.3.8"
+env_logger="0.4.3"
+regex="0.2.2"
+rand="0.3.15"
+[dependencies.image]
+version="0.14.0"
+features=["webp"]

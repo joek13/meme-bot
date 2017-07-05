@@ -1,0 +1,27 @@
+name="The Floor Is _"
+short_name="floor"
+image="./floor.jpg"
+[[features]]
+kind="Text"
+x=5
+y=5
+w=730
+h=90
+font_size=40
+font_color=[0,0,0,255]
+[[features]]
+kind="Image"
+x=97
+y=96
+w=72
+h=76
+stretch=true
+rotation=5
+mask="./floor_mask.png"
+[[features]]
+kind="Image"
+x=573
+y=101
+w=32
+h=32
+stretch=true

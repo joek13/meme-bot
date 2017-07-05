@@ -1,0 +1,11 @@
+name="Woke"
+short_name="woke"
+image="./woke.jpg"
+[[features]]
+kind="Text"
+w=142
+h=50
+x=114
+y=394
+font_size=20
+alignment="Center"

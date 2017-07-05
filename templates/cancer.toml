@@ -1,0 +1,9 @@
+name="Cancer"
+short_name="cancer"
+image="./signs.png"
+[[features]]
+kind="Image"
+x=386
+y=60
+w=64
+h=64

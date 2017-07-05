@@ -1,0 +1,12 @@
+name="Very Rare"
+short_name="rare"
+image="./rare.png"
+[[features]]
+kind="Text"
+rotation=-33
+x=150
+y=536
+w=323
+h=80
+font_size=50
+alignment="Center"
