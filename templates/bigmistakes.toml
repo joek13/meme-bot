@@ -1,0 +1,13 @@
+name="Big Mistakes"
+short_name="bigmistakes"
+image="./bigmistakes.png"
+
+[[features]]
+kind="Either"
+x=523
+y=592
+w=363
+h=363
+stretch=false
+align="Center"
+font_size=80
