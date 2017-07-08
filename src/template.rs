@@ -75,9 +75,17 @@ impl Template {
         file.read_to_string(&mut contents)?;
         let mut template: Template = toml::from_str(contents.as_str())?;
         template.image = path.parent().unwrap_or(path).join(&template.image);
-        //validate template
-        if !template.image.exists() {
-            return Err(Error::Invalid("Image does not exist".to_owned()));
+        let bg_image_dim;
+        //make sure the image exists, is valid, and cache the dimensions in case there are any
+        //masks.
+        match image::open(&template.image) {
+            Ok(image) => {
+                //gotta get dimensions to check the masks
+                bg_image_dim = image.dimensions(); 
+            }
+            Err(e) => {
+                return Err(Error::Invalid(format!("Error loading background image: {}", e.to_string())));
+            }
         }
         for feature in &mut template.features {
             if feature.kind == FeatureType::Text || feature.kind == FeatureType::Either {
@@ -93,6 +101,18 @@ impl Template {
                         let relative = path.parent().unwrap_or(path).join(&mask_path);
                         if !relative.exists() {
                             return Err(Error::Invalid("Image mask doesn't exist".to_owned()));
+                        }
+                        //check that mask is valid image, as well as its dimensions matching
+                        match image::open(&relative) {
+                            Ok(img) => {
+                                if img.dimensions() != bg_image_dim {
+                                    return Err(Error::Invalid("Mask dimensions do not match background image dimensions".to_string()));
+                                }
+                            }
+                            Err(e) => {
+                                return Err(Error::Invalid(format!("Error opening mask image {}: {}", relative.to_string_lossy(), e.to_string())));
+                            }
+
                         }
                         *mask_path = relative;
                     }
