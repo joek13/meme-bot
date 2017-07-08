@@ -80,16 +80,15 @@ impl Template {
             return Err(Error::Invalid("Image does not exist".to_owned()));
         }
         for feature in &mut template.features {
-            match feature.kind {
-                FeatureType::Text | FeatureType::Either => {
-                    if let None = feature.font_size {
-                        return Err(Error::Invalid("Text feature is missing required field 'font_size'".to_owned()));
-                    }
-                    if let None = feature.font_color {
-                        feature.font_color = Some([0, 0, 0, 255]); //default to black
-                    }
+            if feature.kind == FeatureType::Text || feature.kind == FeatureType::Either {
+                if let None = feature.font_size {
+                    return Err(Error::Invalid("Text feature is missing required field 'font_size'".to_owned()));
                 }
-                FeatureType::Image => {
+                if let None = feature.font_color {
+                    feature.font_color = Some([0, 0, 0, 255]); //default to black
+                }
+            }
+            if feature.kind == FeatureType::Image || feature.kind == FeatureType::Either {
                     if let Some(ref mut mask_path) = feature.mask {
                         let relative = path.parent().unwrap_or(path).join(&mask_path);
                         if !relative.exists() {
@@ -97,8 +96,6 @@ impl Template {
                         }
                         *mask_path = relative;
                     }
-                }
-
             }
         }
         Ok(template)
