@@ -1,0 +1,10 @@
+name="Crazy Condom Fails"
+short_name="condomfails"
+image="./condomfails.jpg"
+[[features]]
+kind="Image"
+x=0
+y=393
+w=323
+h=323
+
