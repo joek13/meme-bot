@@ -1,4 +1,3 @@
-# MemeBot
 MemeBot is a Discord bot that can help you and your users make memes. Using a set of owner-defined templates, users can use the `+meme` command to generate memes at will. 
 
 If you want MemeBot on your server, there is a public instance that uses the prefix `+memebot` (e.g. the command `+help` becomes `+memebot help`) to avoid prefix conflicts.
@@ -28,7 +27,7 @@ Output:
 ## Installing/Running
 ------
 
-Clone this repo and run with `cargo run`. Be sure that you have set the env var `DISCORD_TOKEN` (i.e. `export DISCORD_TOKEN=mytoken`) to your bot's token before running.
+Clone this repo and run with `cargo run`. Be sure that you check the Configuring section to add a `config.toml` file for your bot to use.
 ## Configuring
 ------
 
@@ -36,7 +35,7 @@ The bot looks for a file called `config.toml` in your current working directory,
 ## Templates
 ------
 
-Templates are TOML files loaded from the `./templates/` directory and provide a description of all the content that goes into a meme. Templates start with the required fields `kind`, `name`, `short_name`, and `image`. `name` and `short_name` help identify the template, but only `short_name` is used to actually invoke the template. `image` is a path to the base image to add to (relative to the template file itself). After that, *features* are listed. *Features* are parts of a template that can be filled in by users, and are what allow the bot to have unique content generated. Features can be `Text`, `Image`, or `Either` features. `Text` features act as simple text-boxes, whereas `Image` features are areas for images to be pasted on. **All** features use the `x`, `y`, `w`, and `h` properties (as well as `rotation`, optionally) to define the rectangle that text or images can be overlaid within.
+Templates are TOML files loaded from the `./templates/` directory (relative to the current working directory) and provide a description of all the content that goes into a meme. Templates start with the required fields `kind`, `name`, `short_name`, and `image`. `name` and `short_name` help identify the template, but only `short_name` is used to actually invoke the template. `image` is a path to the base image to add to (relative to the template file itself). After that, *features* are listed. *Features* are parts of a template that can be filled in by users, and are what allow the bot to have unique content generated. Features can be `Text`, `Image`, or `Either` features. `Text` features act as simple text-boxes, whereas `Image` features are areas for images to be pasted on. **All** features use the `x`, `y`, `w`, and `h` properties (as well as `rotation`, optionally) to define the rectangle that text or images can be overlaid within.
 
 ## Template Manifest Spec
 
@@ -45,6 +44,7 @@ Templates are TOML files loaded from the `./templates/` directory and provide a 
 |:--------:|:----:|:--------:|--------------------------------------------|
 | `name`     | String | Required | The long, descriptive name to show alongside generated images. |
 | `short_name`| String | Required | The short, easy name to use with commands. |
+| `aliases` | String List | Optional | A list of aliases that this template can also be invoked with. |
 | `image` | Path String | Required | The base image to build templates from. The path is relative to this template. |
 | `features` | List | Required | A list of features to put on the template. |
 
