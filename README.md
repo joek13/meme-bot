@@ -1,3 +1,6 @@
+# MemeBot
+------
+
 MemeBot is a Discord bot that can help you and your users make memes. Using a set of owner-defined templates, users can use the `+meme` command to generate memes at will. 
 
 If you want MemeBot on your server, there is a public instance that uses the prefix `+memebot` (e.g. the command `+help` becomes `+memebot help`) to avoid prefix conflicts.
