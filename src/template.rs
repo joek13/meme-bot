@@ -34,10 +34,12 @@ use hyper_native_tls::NativeTlsClient;
 const FONT: &[u8] = include_bytes!("Roboto.ttf");
 const DEG_2_RAD: f32 = PI / 180.0;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Template {
     pub image: PathBuf,
     pub name: String,
+    #[serde(default)]
+    pub aliases: Vec<String>,
     pub short_name: String,
     pub features: Vec<Feature>,
 }
@@ -53,7 +55,7 @@ pub enum Alignment {
     Center,
     Right,
 }
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Feature {
     pub kind: FeatureType,
     pub x: u32,
@@ -81,59 +83,73 @@ impl Template {
         match image::open(&template.image) {
             Ok(image) => {
                 //gotta get dimensions to check the masks
-                bg_image_dim = image.dimensions(); 
+                bg_image_dim = image.dimensions();
             }
             Err(e) => {
-                return Err(Error::Invalid(format!("Error loading background image: {}", e.to_string())));
+                return Err(Error::Invalid(
+                    format!("Error loading background image: {}", e.to_string()),
+                ));
             }
         }
         for feature in &mut template.features {
             if feature.kind == FeatureType::Text || feature.kind == FeatureType::Either {
                 if let None = feature.font_size {
-                    return Err(Error::Invalid("Text feature is missing required field 'font_size'".to_owned()));
+                    return Err(Error::Invalid(
+                        "Text feature is missing required field 'font_size'"
+                            .to_owned(),
+                    ));
                 }
                 if let None = feature.font_color {
                     feature.font_color = Some([0, 0, 0, 255]); //default to black
                 }
             }
             if feature.kind == FeatureType::Image || feature.kind == FeatureType::Either {
-                    if let Some(ref mut mask_path) = feature.mask {
-                        let relative = path.parent().unwrap_or(path).join(&mask_path);
-                        if !relative.exists() {
-                            return Err(Error::Invalid("Image mask doesn't exist".to_owned()));
-                        }
-                        //check that mask is valid image, as well as its dimensions matching
-                        match image::open(&relative) {
-                            Ok(img) => {
-                                if img.dimensions() != bg_image_dim {
-                                    return Err(Error::Invalid("Mask dimensions do not match background image dimensions".to_string()));
-                                }
-                            }
-                            Err(e) => {
-                                return Err(Error::Invalid(format!("Error opening mask image {}: {}", relative.to_string_lossy(), e.to_string())));
-                            }
-
-                        }
-                        *mask_path = relative;
+                if let Some(ref mut mask_path) = feature.mask {
+                    let relative = path.parent().unwrap_or(path).join(&mask_path);
+                    if !relative.exists() {
+                        return Err(Error::Invalid("Image mask doesn't exist".to_owned()));
                     }
+                    //check that mask is valid image, as well as its dimensions matching
+                    match image::open(&relative) {
+                        Ok(img) => {
+                            if img.dimensions() != bg_image_dim {
+                                return Err(Error::Invalid(
+                                    "Mask dimensions do not match background image dimensions"
+                                        .to_string(),
+                                ));
+                            }
+                        }
+                        Err(e) => {
+                            return Err(Error::Invalid(format!(
+                                "Error opening mask image {}: {}",
+                                relative.to_string_lossy(),
+                                e.to_string()
+                            )));
+                        }
+
+                    }
+                    *mask_path = relative;
+                }
             }
         }
         Ok(template)
     }
-    fn generate_text_image(feature: &Feature,
-                           bg_image: &DynamicImage,
-                           font: &Font,
-                           show_rectangles: bool,
-                           text: &str)
-                           -> Result<RgbaImage> {
+    fn generate_text_image(
+        feature: &Feature,
+        bg_image: &DynamicImage,
+        font: &Font,
+        show_rectangles: bool,
+        text: &str,
+    ) -> Result<RgbaImage> {
         assert!(feature.kind == FeatureType::Text || feature.kind == FeatureType::Either);
         let mut font_image = RgbaImage::new(bg_image.width(), bg_image.height());
         if show_rectangles {
             //for debug and templates
-            draw_hollow_rect_mut(&mut font_image,
-                                 Rect::at(feature.x as i32, feature.y as i32)
-                                     .of_size(feature.w, feature.h),
-                                 Rgba([255, 0, 0, 255]));
+            draw_hollow_rect_mut(
+                &mut font_image,
+                Rect::at(feature.x as i32, feature.y as i32).of_size(feature.w, feature.h),
+                Rgba([255, 0, 0, 255]),
+            );
         }
         let mut height = feature.font_size.unwrap();
         let mut scale = Scale {
@@ -152,35 +168,42 @@ impl Template {
             char_width = (feature.w as f32 * 2.4 / height).floor() as usize; //Magic Number (tm)
         }
         for (line_index, line) in
-            align_text(text,
-                       char_width,
-                       feature.alignment.unwrap_or(Alignment::Left))
-                    .iter()
-                    .enumerate() {
+            align_text(
+                text,
+                char_width,
+                feature.alignment.unwrap_or(Alignment::Left),
+            ).iter()
+                .enumerate()
+        {
             if line_index >= max_lines {
                 break;
             }
-            draw_text_mut(&mut font_image,
-                          Rgba(feature.font_color.unwrap()),
-                          feature.x,
-                          feature.y + (line_index as f32 * height) as u32,
-                          scale,
-                          &font,
-                          line);
+            draw_text_mut(
+                &mut font_image,
+                Rgba(feature.font_color.unwrap()),
+                feature.x,
+                feature.y + (line_index as f32 * height) as u32,
+                scale,
+                &font,
+                line,
+            );
         }
         if let Some(rotation) = feature.rotation {
-            font_image = rotate_with_default(&font_image,
-                                             (feature.x as f32, feature.y as f32),
-                                             rotation * DEG_2_RAD,
-                                             Rgba([0, 0, 0, 0]),
-                                             Interpolation::Bilinear);
+            font_image = rotate_with_default(
+                &font_image,
+                (feature.x as f32, feature.y as f32),
+                rotation * DEG_2_RAD,
+                Rgba([0, 0, 0, 0]),
+                Interpolation::Bilinear,
+            );
         }
         Ok(font_image)
     }
-    fn generate_image_image(feature: &Feature,
-                            bg_image: &DynamicImage,
-                            url: &str)
-                            -> Result<RgbaImage> {
+    fn generate_image_image(
+        feature: &Feature,
+        bg_image: &DynamicImage,
+        url: &str,
+    ) -> Result<RgbaImage> {
         let mut image = Vec::new();
         if let Ok(url) = Url::parse(url) {
             let ssl = NativeTlsClient::new().unwrap();
@@ -223,19 +246,23 @@ impl Template {
         } else {
             dim = (feature.w, feature.h);
         }
-        paste_image_resized(&overlay_image,
-                            &mut underlay_image,
-                            feature.x + offset.0,
-                            feature.y + offset.1,
-                            dim.0,
-                            dim.1);
+        paste_image_resized(
+            &overlay_image,
+            &mut underlay_image,
+            feature.x + offset.0,
+            feature.y + offset.1,
+            dim.0,
+            dim.1,
+        );
 
         if let Some(rotation) = feature.rotation {
-            underlay_image = rotate_with_default(&underlay_image,
-                                                 (feature.x as f32, feature.y as f32),
-                                                 rotation * DEG_2_RAD,
-                                                 Rgba([0, 0, 0, 0]),
-                                                 Interpolation::Bilinear);
+            underlay_image = rotate_with_default(
+                &underlay_image,
+                (feature.x as f32, feature.y as f32),
+                rotation * DEG_2_RAD,
+                Rgba([0, 0, 0, 0]),
+                Interpolation::Bilinear,
+            );
         }
         //masking: mask the underlay_image with the mask bitmap (if given)
         if let Some(ref path) = feature.mask {
@@ -259,11 +286,13 @@ impl Template {
             } else {
                 match feature.kind {
                     FeatureType::Text => {
-                        let font_image = Template::generate_text_image(feature,
-                                                                       &bg_image,
-                                                                       &font,
-                                                                       show_rectangles,
-                                                                       text[index])?;
+                        let font_image = Template::generate_text_image(
+                            feature,
+                            &bg_image,
+                            &font,
+                            show_rectangles,
+                            text[index],
+                        )?;
                         paste_image(&font_image, &mut bg_image, 0, 0);
                     }
                     FeatureType::Image => {
@@ -280,11 +309,13 @@ impl Template {
                                 Template::generate_image_image(feature, &bg_image, text[index])?;
                         } else {
                             //it's text.
-                            image = Template::generate_text_image(feature,
-                                                                  &bg_image,
-                                                                  &font,
-                                                                  show_rectangles,
-                                                                  text[index])?;
+                            image = Template::generate_text_image(
+                                feature,
+                                &bg_image,
+                                &font,
+                                show_rectangles,
+                                text[index],
+                            )?;
                         }
                         paste_image(&image, &mut bg_image, 0, 0);
                     }

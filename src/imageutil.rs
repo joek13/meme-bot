@@ -7,7 +7,12 @@ use image::RgbaImage;
 use image::Rgba;
 use std::cmp::min;
 
-pub fn paste_image<D: GenericImage + 'static, S: GenericImage<Pixel=D::Pixel> + 'static>(source: &S, destination: &mut D, x: u32, y: u32){
+pub fn paste_image<D: GenericImage + 'static, S: GenericImage<Pixel = D::Pixel> + 'static>(
+    source: &S,
+    destination: &mut D,
+    x: u32,
+    y: u32,
+) {
     for i in 0..source.width() {
         for k in 0..source.height() {
             if i + x < destination.width() && k + y < destination.height() {
@@ -19,13 +24,17 @@ pub fn paste_image<D: GenericImage + 'static, S: GenericImage<Pixel=D::Pixel> + 
         }
     }
 }
-pub fn paste_image_resized<D: GenericImage + 'static, S: GenericImage<Pixel = D::Pixel> + 'static>
-    (source: &S,
-     destination: &mut D,
-     x: u32,
-     y: u32,
-     w: u32,
-     h: u32) {
+pub fn paste_image_resized<
+    D: GenericImage + 'static,
+    S: GenericImage<Pixel = D::Pixel> + 'static,
+>(
+    source: &S,
+    destination: &mut D,
+    x: u32,
+    y: u32,
+    w: u32,
+    h: u32,
+) {
     let resized = resize(source, w, h, image::FilterType::Nearest); //resize image
 
     for i in 0..resized.width() {
@@ -48,10 +57,12 @@ pub fn mask_image(input_image: RgbaImage, mask_image: &GrayImage) -> RgbaImage {
             let mask_pixel = mask_image.get_pixel(i, k);
             let input_pixel = input_image.get_pixel(i, k);
             let new_pixel = Rgba {
-                data: [input_pixel.data[0],
-                       input_pixel.data[1],
-                       input_pixel.data[2],
-                       min(mask_pixel.data[0], input_pixel.data[3])], //don't use mask alpha if the original image's alpha is less
+                data: [
+                    input_pixel.data[0],
+                    input_pixel.data[1],
+                    input_pixel.data[2],
+                    min(mask_pixel.data[0], input_pixel.data[3]),
+                ], //don't use mask alpha if the original image's alpha is less
             };
             output_image.put_pixel(i, k, new_pixel)
         }

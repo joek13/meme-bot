@@ -50,7 +50,7 @@ use serenity::client::Context;
 use serenity::CACHE;
 
 lazy_static! {
-    static ref TEMPLATES: RwLock<HashMap<String, Template>> = RwLock::new(HashMap::new());
+    static ref TEMPLATES: RwLock<Vec<Template>> = RwLock::new(Vec::new());
     static ref CONFIG: RwLock<Config> = RwLock::new(Config::new());
 }
 
@@ -72,7 +72,7 @@ fn main() {
             }
             info!("Loading templates...");
             LazyStatic::initialize(&TEMPLATES);
-            match template_map() {
+            match load_templates() {
                 Ok(templates) => {
                     {
                         let mut cache = TEMPLATES.write().unwrap();
@@ -109,9 +109,10 @@ fn main() {
                     });
                     client.on_ready(|_ctx, e| {
                         info!("Logged in as {}", e.user.name);
-                        _ctx.set_game(Game::playing(format!("{}help for help",
-                                                            CONFIG.read().unwrap().prefix)
-                                                            .as_str()));
+                        _ctx.set_game(Game::playing(
+                            format!("{}help for help", CONFIG.read().unwrap().prefix)
+                                .as_str(),
+                        ));
                     });
                     let _ = client.start();
                 }
@@ -126,24 +127,23 @@ fn main() {
         }
     }
 }
-fn template_map() -> Result<HashMap<String, Template>, (Option<String>, template::Error)> {
-    let templates = load_templates()?;
-    let mut template_map: HashMap<String, Template> = HashMap::new();
-    for template in templates.into_iter() {
-        template_map.insert(template.short_name.clone(), template);
-    }
-    Ok(template_map)
+fn get_template<'a>(templates: &'a Vec<Template>, name: &str) -> Option<&'a Template> {
+    templates.iter().find(|template| {
+        template.short_name == name || template.aliases.contains(&name.to_owned())
+    })
 }
 fn load_templates() -> Result<Vec<Template>, (Option<String>, template::Error)> {
     let mut templates = Vec::new();
-    let files = fs::read_dir("./templates")
-        .map_err(|e| (None, template::Error::Io(e)))?;
+    let files = fs::read_dir("./templates").map_err(|e| {
+        (None, template::Error::Io(e))
+    })?;
     for file in files {
         let path = file.map_err(|e| (None, template::Error::Io(e)))?.path();
         match path.extension().map(|e| e.to_str().unwrap_or("")) {
             Some("toml") => {
-                templates.push(Template::from_file(path.as_path())
-                                   .map_err(|e| (Some(path.to_str().unwrap().to_owned()), e))?);
+                templates.push(Template::from_file(path.as_path()).map_err(|e| {
+                    (Some(path.to_str().unwrap().to_owned()), e)
+                })?);
             }
             _ => {}
         }
@@ -154,8 +154,8 @@ fn list_templates() -> String {
     TEMPLATES
         .read()
         .unwrap()
-        .keys()
-        .map(|x| format!("`{}`", x))
+        .iter()
+        .map(|x| format!("`{}`", x.short_name))
         .collect::<Vec<String>>()
         .join(", ")
 }
@@ -166,8 +166,10 @@ command!(meme(_ctx, message, args) {
             let _ = message.reply(format!("**Usage**: `{}meme <template> \"<text1>\" \"[text2]\" ...`\nTemplates you can use: {}\nUse `{}info <template>` for more specific information.", prefix, list_templates(), prefix).as_str());
         }
         _ => {
-            let ref template = args[0];
-            if let Some(template) = TEMPLATES.read().unwrap().get(template) {
+            let ref template_name = args[0];
+            let templates = TEMPLATES.read().unwrap();
+            let template = get_template(&templates, template_name.as_str());
+            if let Some(template) = template {
                 let texts = args.iter().skip(1).map(|x| x.as_str()).collect::<Vec<&str>>();
                 match parse::parse_text(texts.as_slice()) {
                     Ok(mut texts) => {
@@ -211,7 +213,7 @@ command!(meme(_ctx, message, args) {
                     }
                 }
             } else {
-                let _ = message.reply(format!("{} is not a valid template. Options: {}", template, list_templates()).as_str());
+                let _ = message.reply(format!("{} is not a valid template. Options: {}", template_name, list_templates()).as_str());
             }
         }
     }
@@ -219,13 +221,15 @@ command!(meme(_ctx, message, args) {
 command!(list(_ctx, message) {
     let _ = message.channel_id.say(format!("Hi {}, here's a list of all the templates you can use: {}\nUse **{}info <meme>** to get more specific information.", message.author.mention(), list_templates(), CONFIG.read().unwrap().prefix).as_str());
 });
-const TIPS: &[&'static str] = &["Wanna make fun of your friends? @-mention them in lieu of an image, and the resulting meme will have their avatar!",
-                                "If you put too much text in a text box, it will automatically be sized down until it fits.",
-                                "Use the `info` command to get the down-n-dirty details about a template.",
-                                "Text with spaces in it needs to be escaped with quotes (\"). If your argument is a url, or the text is only one word, then leave the quotes out!",
-                                "If you want quotes inside your meme, escape them with a backslash (\\\\\"). If you want to use a backslash, just escape it with another one!",
-                                "Both double quotes (\") and single quotes (\') can be used to have spaces in text. Since only the outermost kind of quote is recognized, single quotes can be used unescaped inside of double quotes and vice-versa.",
-                                "If you insta-pick Jungle Legion, you're trash."];
+const TIPS: &[&'static str] = &[
+    "Wanna make fun of your friends? @-mention them in lieu of an image, and the resulting meme will have their avatar!",
+    "If you put too much text in a text box, it will automatically be sized down until it fits.",
+    "Use the `info` command to get the down-n-dirty details about a template.",
+    "Text with spaces in it needs to be escaped with quotes (\"). If your argument is a url, or the text is only one word, then leave the quotes out!",
+    "If you want quotes inside your meme, escape them with a backslash (\\\\\"). If you want to use a backslash, just escape it with another one!",
+    "Both double quotes (\") and single quotes (\') can be used to have spaces in text. Since only the outermost kind of quote is recognized, single quotes can be used unescaped inside of double quotes and vice-versa.",
+    "If you insta-pick Jungle Legion, you're trash.",
+];
 command!(tip(_ctx, message) {
     let index = rand::thread_rng().gen_range::<usize>(0, TIPS.len());
     let _ = message.channel_id.say(format!("***Pro Memester Tip #{}:*** {}", index+1, TIPS[index]).as_str());
@@ -237,7 +241,7 @@ command!(info(_ctx, message, args) {
         }
         _ => {
             let ref template = args[0];
-            if let Some(template) = TEMPLATES.read().unwrap().get(template) {
+            if let Some(template) = get_template(&TEMPLATES.read().unwrap(), template.as_str()) {
                 let mut texts = Vec::new();
                 for i in 0..template.features.len() {
                     texts.push(format!("Text {}", i+1));
@@ -264,9 +268,10 @@ command!(info(_ctx, message, args) {
                 //show info
                 let _ = message.channel_id.send_files(vec![(buf.as_slice(), filename)], |m|
                     m.content(
-                        format!("**{}**\n**Short name**: {}\n**Features: ** {}\n**Example Usage:** `{}`\n**Template:**",
+                        format!("**{}**\n**Short name**: {}\n**Aliases:** {}\n**Features:** {}\n**Example Usage:** `{}`\n**Template:**",
                                 template.name,
                                 template.short_name,
+                                if template.aliases.len() > 0 {template.aliases.join(", ")} else {"None".to_owned()},
                                 template.features.len(), 
                                 example_usage)
                         .as_str()
@@ -278,21 +283,26 @@ command!(info(_ctx, message, args) {
     }
 });
 fn invite_url(id: UserId) -> String {
-    format!("https://discordapp.com/oauth2/authorize?permissions=35840&scope=bot&client_id={}",
-            id)
+    format!(
+        "https://discordapp.com/oauth2/authorize?permissions=35840&scope=bot&client_id={}",
+        id
+    )
 }
 command!(invite(_ctx, message) {
     let _ = message.reply(format!("Use this link to invite me to your server: {}", invite_url(CACHE.read().unwrap().user.id)).as_str());
 });
-fn help(_ctx: &mut Context,
-        message: &Message,
-        commands: HashMap<String, Arc<CommandGroup>>,
-        args: &[String])
-        -> Result<(), String> {
+fn help(
+    _ctx: &mut Context,
+    message: &Message,
+    commands: HashMap<String, Arc<CommandGroup>>,
+    args: &[String],
+) -> Result<(), String> {
     match args.len() {
         0 => {
-            let mut response = format!("Hello {}, here's a list of commands:\n",
-                                       message.author.mention());
+            let mut response = format!(
+                "Hello {}, here's a list of commands:\n",
+                message.author.mention()
+            );
             //list all commands
             for group in commands.values() {
                 for (name, command) in &group.commands {
@@ -309,9 +319,10 @@ fn help(_ctx: &mut Context,
                     }
                 }
             }
-            response += format!("Use `{}help <command>` to get more specific information about one command.",
-                                CONFIG.read().unwrap().prefix)
-                    .as_str();
+            response += format!(
+                "Use `{}help <command>` to get more specific information about one command.",
+                CONFIG.read().unwrap().prefix
+            ).as_str();
             let _ = message.channel_id.say(response.as_str());
         }
         1 => {
@@ -332,10 +343,12 @@ fn help(_ctx: &mut Context,
                             };
                             let example = {
                                 if let Some(ref example) = command.example {
-                                    format!("{}{} {}",
-                                            CONFIG.read().unwrap().prefix,
-                                            command_name,
-                                            example)
+                                    format!(
+                                        "{}{} {}",
+                                        CONFIG.read().unwrap().prefix,
+                                        command_name,
+                                        example
+                                    )
                                 } else {
                                     format!("{}{}", CONFIG.read().unwrap().prefix, command_name)
                                 }
@@ -353,11 +366,13 @@ fn help(_ctx: &mut Context,
                 }
             }
             if !command_found {
-                let _ = message
-                    .reply(format!("Command `{}` not found. Type `{}help` to list commands.",
-                                   name,
-                                   CONFIG.read().unwrap().prefix)
-                                   .as_str());
+                let _ = message.reply(
+                    format!(
+                        "Command `{}` not found. Type `{}help` to list commands.",
+                        name,
+                        CONFIG.read().unwrap().prefix
+                    ).as_str(),
+                );
             }
         }
         _ => {

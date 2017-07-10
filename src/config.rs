@@ -24,7 +24,7 @@ pub struct Config {
     ///The bot's login token.
     pub token: String,
     ///The bot's prefix. Default is '+'
-    #[serde(default="default_prefix")]
+    #[serde(default = "default_prefix")]
     pub prefix: String,
 }
 impl Config {

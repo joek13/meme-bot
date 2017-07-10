@@ -62,7 +62,9 @@ mod test {
     #[test]
     fn parse_works() {
         use parse::parse_text;
-        assert_eq!(parse_text(&["echo", "\"hello world\""]).unwrap().as_slice(),
-                   &[String::from("echo"), String::from("hello world")]);
+        assert_eq!(
+            parse_text(&["echo", "\"hello world\""]).unwrap().as_slice(),
+            &[String::from("echo"), String::from("hello world")]
+        );
     }
 }

@@ -1,7 +1,7 @@
 name="Not All Disabilities"
 short_name="disabilities"
 image="./disabilities.jpg"
-
+aliases=["disability"]
 [[features]]
 w=161
 h=251

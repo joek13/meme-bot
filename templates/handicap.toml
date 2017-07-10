@@ -1,6 +1,7 @@
 name="Handicapped"
 short_name="handicap"
 image="./handicap.png"
+aliases=["handicapped"]
 [[features]]
 kind="Text"
 x=273
