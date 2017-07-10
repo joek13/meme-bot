@@ -1,0 +1,11 @@
+name="Handicapped"
+short_name="handicap"
+image="./handicap.png"
+[[features]]
+kind="Text"
+x=273
+y=314
+w=257
+h=73
+font_size=60
+alignment="Center"
