@@ -4,17 +4,21 @@ image="./bouncer.png"
 
 [[features]]
 kind="Either"
-x=10
-y=10
-w=325
-h=320
+x=0
+y=0
+w=349
+h=340
+margin_left=10
+margin_top=10
 font_size=40
 
 [[features]]
 kind="Either"
-x=10
-y=360
-w=325
-h=290
+x=0
+y=340
+w=349
+h=340
+margin_left=10
+margin_top=10
 font_size=40
 
