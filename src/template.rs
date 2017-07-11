@@ -25,7 +25,7 @@ use image;
 use rusttype::{FontCollection, Font, Scale};
 
 use imageproc::drawing::{draw_text_mut, draw_hollow_rect_mut};
-use imageproc::rect::Rect;
+use imageproc::rect;
 use imageproc::affine::rotate_with_default;
 use imageproc::affine::Interpolation;
 
@@ -68,6 +68,14 @@ pub struct Feature {
     pub alignment: Option<Alignment>,
     pub stretch: Option<bool>,
     pub mask: Option<PathBuf>,
+    #[serde(default)]
+    pub margin_left: u32,
+    #[serde(default)]
+    pub margin_right: u32,
+    #[serde(default)]
+    pub margin_top: u32,
+    #[serde(default)]
+    pub margin_bottom: u32,
 }
 impl Template {
     pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Template> {
@@ -101,6 +109,18 @@ impl Template {
                 }
                 if let None = feature.font_color {
                     feature.font_color = Some([0, 0, 0, 255]); //default to black
+                }
+                if feature.margin_left + feature.margin_right > feature.w {
+                    return Err(Error::Invalid(
+                        "Horizontal margins add up to more than feature's width"
+                            .to_owned(),
+                    ));
+                }
+                if feature.margin_top + feature.margin_bottom > feature.h {
+                    return Err(Error::Invalid(
+                        "Vertical margins add up to more than feature's height"
+                            .to_owned(),
+                    ));
                 }
             }
             if feature.kind == FeatureType::Image || feature.kind == FeatureType::Either {
@@ -147,7 +167,7 @@ impl Template {
             //for debug and templates
             draw_hollow_rect_mut(
                 &mut font_image,
-                Rect::at(feature.x as i32, feature.y as i32).of_size(feature.w, feature.h),
+                rect::Rect::at(feature.x as i32, feature.y as i32).of_size(feature.w, feature.h),
                 Rgba([255, 0, 0, 255]),
             );
         }
@@ -156,16 +176,23 @@ impl Template {
             x: height,
             y: height,
         };
-        let mut max_lines = (feature.h as f32 / height).floor() as usize;
-        let mut char_width = (feature.w as f32 * 2.4 / height).floor() as usize; //Magic Number (tm) to get char width from rect width
+        //rest of the calculations have to use the rect with margin factored in
+        let feature_rect = Rect::new(
+            feature.x + feature.margin_left, //offset left edge by margin_left
+            feature.y + feature.margin_top, //offset top edge by margin_top
+            feature.w - (feature.margin_left + feature.margin_right), //width = width - margins
+            feature.h - (feature.margin_top + feature.margin_bottom), //height = height - margins
+        );
+        let mut max_lines = (feature_rect.h as f32 / height).floor() as usize;
+        let mut char_width = (feature_rect.w as f32 * 2.4 / height).floor() as usize; //Magic Number (tm) to get char width from rect width
         while wrap(text, char_width).len() > max_lines {
             height -= 1.0;
             scale = Scale {
                 x: height,
                 y: height,
             };
-            max_lines = (feature.h as f32 / height).floor() as usize;
-            char_width = (feature.w as f32 * 2.4 / height).floor() as usize; //Magic Number (tm)
+            max_lines = (feature_rect.h as f32 / height).floor() as usize;
+            char_width = (feature_rect.w as f32 * 2.4 / height).floor() as usize; //Magic Number (tm)
         }
         for (line_index, line) in
             align_text(
@@ -181,8 +208,8 @@ impl Template {
             draw_text_mut(
                 &mut font_image,
                 Rgba(feature.font_color.unwrap()),
-                feature.x,
-                feature.y + (line_index as f32 * height) as u32,
+                feature_rect.x,
+                feature_rect.y + (line_index as f32 * height) as u32,
                 scale,
                 &font,
                 line,
@@ -323,6 +350,22 @@ impl Template {
             }
         }
         Ok(bg_image)
+    }
+}
+struct Rect {
+    x: u32,
+    y: u32,
+    w: u32,
+    h: u32,
+}
+impl Rect {
+    pub fn new(x: u32, y: u32, w: u32, h: u32) -> Rect {
+        Rect {
+            x: x,
+            y: y,
+            w: w,
+            h: h,
+        }
     }
 }
 const PAD_CHAR: char = ' '; //this is actually an en space, which is significantly wider when rendered
