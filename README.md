@@ -120,9 +120,10 @@ alignment="Center"
 From the output of `+help`:
 ```
   help - Lists all the commands or gives specific help for one command..
-  tip - Replies with a pro-tip for using the bot.
-  info - Gets more specific information about a template.
   list - Lists all the templates to choose from.
   meme - Generates an image based on a template.
+  tip - Replies with a pro-tip for using the bot.
+  prefix - List all the prefixes you can reach the bot with.
   invite - Replies with a link to invite me to your server.
+  info - Gets more specific information about a template.
 ```
