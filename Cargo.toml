@@ -1,6 +1,6 @@
 [package]
 name = "meme_bot"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Joe K <joek1301@gmail.com>"]
 
 [dependencies]
