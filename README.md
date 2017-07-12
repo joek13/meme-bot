@@ -78,7 +78,10 @@ These properties are specific to `Text` and `Either` features, and will be ignor
 | `font_size` | int | Required | The maximum font size to use in generated images, in pixels. |
 | `alignment` | String | Optional | The text alignment to use. Defaults to `Left`, but can be `Left`, `Center`, or `Right`. |
 | `font_color` | [int, int, int, int] | Optional | An array four integers 0-255 long representing the font color to use. Channels are R, G, B, A. Defaults to [0, 0, 0, 255]. |
-
+| `margin_left` | int | Optional | How many pixels from the left text should be offset by. Useful for `Either` features where the rect should fill up a whole space, but text may need some space from the edges. |
+| `margin_top` | int | Optional | How many pixels from the top text should be offset by. Useful for `Either` features where the rect should fill up a whole space, but text may need some space from the edges. |
+| `margin_right` | int | Optional | How many pixels from the right text should be offset by. Useful for `Either` features where the rect should fill up a whole space, but text may need some space from the edges. |
+| `margin_bottom` | int | Optional | How many pixels from the bottom text should be offset by. Useful for `Either` features where the rect should fill up a whole space, but text may need some space from the edges. |
 #### Example template
 `whowouldwin.toml` from `./templates`: 
 ```
