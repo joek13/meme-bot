@@ -14,8 +14,8 @@ use toml;
 use self::defaults::*;
 
 mod defaults {
-    pub fn default_prefix() -> String {
-        "+".to_owned()
+    pub fn default_prefix() -> Vec<String> {
+        vec!["+".to_owned()]
     }
 }
 
@@ -25,7 +25,7 @@ pub struct Config {
     pub token: String,
     ///The bot's prefix. Default is '+'
     #[serde(default = "default_prefix")]
-    pub prefix: String,
+    pub prefixes: Vec<String>,
 }
 impl Config {
     pub fn load_from<P: AsRef<Path>>(path: P) -> Result<Config, ConfigError> {
@@ -35,12 +35,17 @@ impl Config {
         config_file.read_to_string(&mut config)?;
 
         let config: Config = toml::from_str(config.as_str())?; //parse/deserialize the config file
+        if config.prefixes.len() == 0 {
+            return Err(ConfigError::Invalid(
+                "At least one prefix is required".to_owned(),
+            ));
+        }
         Ok(config)
     }
     pub fn new() -> Config {
         Config {
             token: "".to_owned(),
-            prefix: "".to_owned(),
+            prefixes: Vec::new(),
         }
     }
 }

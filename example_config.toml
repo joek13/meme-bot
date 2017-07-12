@@ -1,2 +1,2 @@
 token="Your token here"
-prefix="+"
+prefixes=["+"] #additional prefixes separated by commas

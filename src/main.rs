@@ -63,11 +63,11 @@ fn main() {
         }
         Ok(config) => {
             let token;
-            let prefix;
+            let prefixes;
             {
                 let mut conf = CONFIG.write().unwrap();
                 token = Some(config.token.clone());
-                prefix = Some(config.prefix.clone());
+                prefixes = Some(config.prefixes.clone());
                 *conf = config;
             }
             info!("Loading templates...");
@@ -81,7 +81,7 @@ fn main() {
                     info!("Logging in...");
                     let mut client = Client::new(token.unwrap().as_str());
                     client.with_framework(move |f| {
-                        f.configure(|c| c.prefix(prefix.unwrap().as_str()))
+                        f.configure(|c| c.prefixes(prefixes.unwrap().iter().map(|x| x.as_str()).collect()))
                             .command("meme", |c| {
                                 c.exec(meme)
                                     .desc("Generates an image based on a template.")
@@ -110,8 +110,10 @@ fn main() {
                     client.on_ready(|_ctx, e| {
                         info!("Logged in as {}", e.user.name);
                         _ctx.set_game(Game::playing(
-                            format!("{}help for help", CONFIG.read().unwrap().prefix)
-                                .as_str(),
+                            format!(
+                                "{}help for help",
+                                CONFIG.read().unwrap().prefixes[0]
+                            ).as_str(),
                         ));
                     });
                     let _ = client.start();
@@ -162,7 +164,7 @@ fn list_templates() -> String {
 command!(meme(_ctx, message, args) {
     match args.len() {
         0|1 => {
-            let ref prefix = CONFIG.read().unwrap().prefix;
+            let ref prefix = CONFIG.read().unwrap().prefixes[0];
             let _ = message.reply(format!("**Usage**: `{}meme <template> \"<text1>\" \"[text2]\" ...`\nTemplates you can use: {}\nUse `{}info <template>` for more specific information.", prefix, list_templates(), prefix).as_str());
         }
         _ => {
@@ -219,7 +221,7 @@ command!(meme(_ctx, message, args) {
     }
 });
 command!(list(_ctx, message) {
-    let _ = message.channel_id.say(format!("Hi {}, here's a list of all the templates you can use: {}\nUse **{}info <meme>** to get more specific information.", message.author.mention(), list_templates(), CONFIG.read().unwrap().prefix).as_str());
+    let _ = message.channel_id.say(format!("Hi {}, here's a list of all the templates you can use: {}\nUse **{}info <meme>** to get more specific information.", message.author.mention(), list_templates(), CONFIG.read().unwrap().prefixes[0]).as_str());
 });
 const TIPS: &[&'static str] = &[
     "Wanna make fun of your friends? @-mention them in lieu of an image, and the resulting meme will have their avatar!",
@@ -246,7 +248,7 @@ command!(info(_ctx, message, args) {
                 for i in 0..template.features.len() {
                     texts.push(format!("Text {}", i+1));
                 }
-                let mut example_usage = format!("{}meme {} ", CONFIG.read().unwrap().prefix, template.short_name);
+                let mut example_usage = format!("{}meme {} ", CONFIG.read().unwrap().prefixes[0], template.short_name);
                 for feature in &template.features {
                     use template::FeatureType;
                     match feature.kind {
@@ -277,7 +279,7 @@ command!(info(_ctx, message, args) {
                         .as_str()
                     ));
             } else {
-                let _ = message.reply(format!("Template `{}` not found. Use `{}list` for a list of templates.", template, CONFIG.read().unwrap().prefix).as_str());
+                let _ = message.reply(format!("Template `{}` not found. Use `{}list` for a list of templates.", template, CONFIG.read().unwrap().prefixes[0]).as_str());
             }
         }
     }
@@ -321,7 +323,7 @@ fn help(
             }
             response += format!(
                 "Use `{}help <command>` to get more specific information about one command.",
-                CONFIG.read().unwrap().prefix
+                CONFIG.read().unwrap().prefixes[0]
             ).as_str();
             let _ = message.channel_id.say(response.as_str());
         }
@@ -345,12 +347,16 @@ fn help(
                                 if let Some(ref example) = command.example {
                                     format!(
                                         "{}{} {}",
-                                        CONFIG.read().unwrap().prefix,
+                                        CONFIG.read().unwrap().prefixes[0],
                                         command_name,
                                         example
                                     )
                                 } else {
-                                    format!("{}{}", CONFIG.read().unwrap().prefix, command_name)
+                                    format!(
+                                        "{}{}",
+                                        CONFIG.read().unwrap().prefixes[0],
+                                        command_name
+                                    )
                                 }
                             };
                             let _ = message
@@ -370,7 +376,7 @@ fn help(
                     format!(
                         "Command `{}` not found. Type `{}help` to list commands.",
                         name,
-                        CONFIG.read().unwrap().prefix
+                        CONFIG.read().unwrap().prefixes[0]
                     ).as_str(),
                 );
             }

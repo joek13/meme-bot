@@ -34,7 +34,7 @@ Clone this repo and run with `cargo run`. Be sure that you check the Configuring
 ## Configuring
 ------
 
-The bot looks for a file called `config.toml` in your current working directory, and won't run without it. `config.toml` should look something like `example_config.toml`. For your convenience, you can rename `example_config.toml` to `config.toml` and then fill in your token, etc.
+The bot looks for a file called `config.toml` in your current working directory, and won't run without it. `config.toml` should look something like `example_config.toml`. For your convenience, you can rename `example_config.toml` to `config.toml` and then fill in your token, etc. Note that multiple prefixes are supported, but the first prefix provided will be the "default prefix" and will be shown in examples.
 ## Templates
 ------
 
