@@ -102,6 +102,11 @@ fn main() {
                                 c.exec(invite)
                                     .desc("Replies with a link to invite me to your server.")
                             })
+                            .command("prefix", |c| {
+                                c.exec(prefix)
+                                    .desc("List all the prefixes you can reach the bot with.")
+                                    .known_as("prefixes")
+                            })
                             .command("tip", |c| {
                                 c.exec(tip)
                                     .desc("Replies with a pro-tip for using the bot.")
@@ -290,6 +295,11 @@ fn invite_url(id: UserId) -> String {
         id
     )
 }
+command!(prefix(_ctx, message) {
+    let ref prefixes = CONFIG.read().unwrap().prefixes;
+    let prefixes = prefixes.iter().map(|x| format!("`{}`", x.trim())).collect::<Vec<String>>().join(", ");
+    let _ = message.reply(format!("Prefixes you can reach me with: {}", prefixes).as_str());
+});
 command!(invite(_ctx, message) {
     let _ = message.reply(format!("Use this link to invite me to your server: {}", invite_url(CACHE.read().unwrap().user.id)).as_str());
 });
