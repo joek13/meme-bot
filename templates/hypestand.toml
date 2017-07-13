@@ -1,0 +1,21 @@
+name="SpongeBob Hype Stand"
+short_name="hypestand"
+aliases=["spongebob"]
+image="./hypestand.jpg"
+[[features]]
+x=154
+y=57
+w=176
+h=42
+kind="Text"
+font_size=40
+alignment="Center"
+[[features]]
+kind="Text"
+w=141
+h=25
+x=54
+y=558
+rotation=14
+font_size=23
+alignment="Center"
