@@ -40,10 +40,12 @@ use std::collections::HashMap;
 use std::sync::RwLock;
 use std::sync::Arc;
 
+use serenity::client;
 use serenity::Client;
 use serenity::model::Mentionable;
 use serenity::framework::CommandGroup;
 use serenity::model::Message;
+use serenity::model::Ready;
 use serenity::model::UserId;
 use serenity::model::Game;
 use serenity::client::Context;
@@ -53,7 +55,18 @@ lazy_static! {
     static ref TEMPLATES: RwLock<Vec<Template>> = RwLock::new(Vec::new());
     static ref CONFIG: RwLock<Config> = RwLock::new(Config::new());
 }
-
+struct Handler {}
+impl client::EventHandler for Handler {
+    fn on_ready(&self, _ctx: Context, ready: Ready) {
+        info!("Logged in as {}", ready.user.name);
+        _ctx.set_game(Game::playing(
+            format!(
+                "{}help for help",
+                CONFIG.read().unwrap().prefixes[0]
+            ).as_str(),
+        ));
+    }
+}
 fn main() {
     env_logger::init().unwrap();
     info!("Loading config...");
@@ -79,7 +92,7 @@ fn main() {
                         *cache = templates;
                     }
                     info!("Logging in...");
-                    let mut client = Client::new(token.unwrap().as_str());
+                    let mut client = Client::new(token.unwrap().as_str(), Handler {});
                     client.with_framework(move |f| {
                         f.configure(|c| c.prefixes(prefixes.unwrap().iter().map(|x| x.as_str()).collect()))
                             .command("meme", |c| {
@@ -111,15 +124,6 @@ fn main() {
                                 c.exec(tip)
                                     .desc("Replies with a pro-tip for using the bot.")
                             })
-                    });
-                    client.on_ready(|_ctx, e| {
-                        info!("Logged in as {}", e.user.name);
-                        _ctx.set_game(Game::playing(
-                            format!(
-                                "{}help for help",
-                                CONFIG.read().unwrap().prefixes[0]
-                            ).as_str(),
-                        ));
                     });
                     let _ = client.start();
                 }

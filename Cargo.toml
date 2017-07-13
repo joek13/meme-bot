@@ -11,7 +11,7 @@ textwrap = "0.6"
 rusttype="0.2.1"
 imageproc={git="https://github.com/joek13/imageproc.git"}
 lazy_static="*"
-serenity={git="https://github.com/joek13/serenity.git"}
+serenity={git="https://github.com/zeyla/serenity.git"}
 time="*"
 hyper="0.10.12"
 url="1.5.0"
