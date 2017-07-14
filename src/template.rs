@@ -224,6 +224,11 @@ impl Template {
                 Interpolation::Bilinear,
             );
         }
+        //masking: mask the font_image with the mask bitmap (if given)
+        if let Some(ref path) = feature.mask {
+            let mask = image::open(path)?;
+            font_image = mask_image(font_image, &mask.to_luma());
+        }
         Ok(font_image)
     }
     fn generate_image_image(
