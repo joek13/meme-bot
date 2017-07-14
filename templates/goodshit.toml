@@ -1,0 +1,15 @@
+name="Good Shit"
+short_name="goodshit"
+image="./goodshit.png"
+[[features]]
+kind="Either"
+alignment="Center"
+margin_top=20
+margin_left=20
+margin_right=20
+x=58
+y=434
+w=119
+h=116
+font_size=40
+mask="./goodshit_mask.png"
