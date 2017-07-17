@@ -1,0 +1,12 @@
+name="Good Dog"
+short_name="speak"
+aliases=["gooddog"]
+image="./speak.png"
+[[features]]
+kind="Text"
+w=295
+h=46
+x=359
+y=5
+font_size=46
+alignment="Center"
