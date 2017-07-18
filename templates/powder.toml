@@ -1,0 +1,22 @@
+name="Mouth Extending Powder"
+short_name="powder"
+aliases=["extendingpowder", "mouthextendingpowder"]
+image="./powder.jpg"
+[[features]]
+kind="Text"
+x=219
+y=196
+w=100
+h=43
+rotation=-40
+font_size=30
+alignment="Center"
+[[features]]
+kind="Text"
+x=154
+y=4
+w=90
+h=45
+font_size=25
+alignment="Center"
+
