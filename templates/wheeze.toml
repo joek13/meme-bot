@@ -1,0 +1,11 @@
+name="Wheeze"
+short_name="wheeze"
+image="./wheeze.png"
+[[features]]
+x=43
+y=459
+w=155
+h=56
+kind="Text"
+font_size=56
+alignment="Center"
