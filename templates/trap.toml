@@ -1,0 +1,10 @@
+name="Trap"
+short_name="trap"
+image="./trap.png"
+[[features]]
+kind="Either"
+w=124
+h=124
+x=362
+y=294
+font_size=40
