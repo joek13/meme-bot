@@ -122,7 +122,7 @@ alignment="Center"
 ------
 From the output of `+help`:
 ```
-  help - Lists all the commands or gives specific help for one command..
+  help - Lists all the commands or gives specific help for one command.
   list - Lists all the templates to choose from.
   meme - Generates an image based on a template.
   tip - Replies with a pro-tip for using the bot.
