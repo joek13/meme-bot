@@ -1,0 +1,19 @@
+name="Help Signal"
+short_name="help"
+aliases=["helpsignal", "sos", "island"]
+image="./help.jpg"
+[[features]]
+kind="Text"
+alignment="Center"
+x=135
+y=785
+w=172
+h=83
+rotation=11
+font_size=30
+[[features]]
+kind="Image"
+x=512
+y=838
+w=66
+h=66
