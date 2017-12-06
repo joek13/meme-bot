@@ -1,0 +1,14 @@
+name="Bernie's Announcement"
+short_name="bernie"
+image="./bernie.png"
+
+[[features]]
+kind="Either"
+font_size=50
+alignment="Center"
+x=296
+y=94
+w=335
+h=279
+rotation=-3.8
+mask="./bernie_mask.png"
