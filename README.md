@@ -7,10 +7,6 @@ If you want MemeBot on your server, there is a public instance that uses the pre
 
 Invite it with [this link](https://discordapp.com/oauth2/authorize?permissions=35840&scope=bot&client_id=329000098090713088).
 
-## In action
-------
-
-![In action GIF](https://fat.gfycat.com/FastWideeyedArmedcrab.gif)
 ## Example commands
 ------
 Users can run commands like:
